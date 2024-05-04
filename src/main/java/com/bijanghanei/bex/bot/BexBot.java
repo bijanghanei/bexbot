@@ -1,5 +1,6 @@
 package com.bijanghanei.bex.bot;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -8,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
-
+@Slf4j
 @Component
 public class BexBot extends TelegramLongPollingBot {
 
@@ -49,5 +50,27 @@ public class BexBot extends TelegramLongPollingBot {
     @Override
     public void onUpdatesReceived(List<Update> updates) {
         super.onUpdatesReceived(updates);
+    }
+    private void sendMessageAndKeyboard(String textToSend, long chatId){
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(textToSend);
+
+//        TODO create keyboard with currencies
+
+        executeMessage(message);
+    }
+    private void sendMessage(String textToSend, long chatId){
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(textToSend);
+        executeMessage(sendMessage);
+    }
+    private void executeMessage(SendMessage sendMessage){
+        try {
+            execute(sendMessage);
+        }catch (TelegramApiException e){
+            log.error("ERROR_TEXT: " + e.getMessage());
+        }
     }
 }
