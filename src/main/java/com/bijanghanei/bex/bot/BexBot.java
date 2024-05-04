@@ -18,7 +18,7 @@ public class BexBot extends TelegramLongPollingBot {
     }
     @Override
     public String getBotToken(){
-        return "7028215795:AAGS1kcRh08AitfvOcDKyaQ3Gk0KDUnVZQo";
+        return "mybottoken";
     }
     @Override
     public void onRegister() {
