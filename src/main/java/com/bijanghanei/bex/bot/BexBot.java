@@ -1,6 +1,7 @@
 package com.bijanghanei.bex.bot;
 
 import com.bijanghanei.bex.config.BotConfig;
+import com.bijanghanei.bex.entity.Price;
 import com.bijanghanei.bex.service.BexService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 @Slf4j
 @Component
 public class BexBot extends TelegramLongPollingBot {
@@ -44,10 +47,17 @@ public class BexBot extends TelegramLongPollingBot {
         if(update.hasMessage()){
             Message message = update.getMessage();
             if(message.hasText()){
+
                 String text = message.getText();
 
                 if (text.equals("/start")){
                     sendMessageAndKeyboard("Hi! Welcome to BEX! \n You can choose the currency you want to get the price for it.",message.getChatId());
+                }else{
+                    List<String> symbols = bexService.getWatchList().getSymbols();
+                    if (symbols.contains(text.toLowerCase())) {
+                        String answer = createPriceString(text);
+                        sendMessage(answer, message.getChatId());
+                    }
                 }
             }
         }
@@ -56,6 +66,13 @@ public class BexBot extends TelegramLongPollingBot {
     @Override
     public void onUpdatesReceived(List<Update> updates) {
         super.onUpdatesReceived(updates);
+    }
+    private String createPriceString(String symbol){
+        Price price = bexService.getPrice(symbol.toLowerCase());
+        String priceString = "High : " + price.getHigh()
+                + "\n Current : " + price.getPrice()
+                + "\n Low : " + price.getLow();
+        return priceString;
     }
     private void sendMessageAndKeyboard(String textToSend, long chatId){
         SendMessage message = new SendMessage();
@@ -72,9 +89,11 @@ public class BexBot extends TelegramLongPollingBot {
 //      Adding symbols to keyboard
 
         for (String symbol : symbols){
-            KeyboardRow row = new KeyboardRow();
-            row.add(symbol);
-            keyboardRowList.add(row);
+            if (!Objects.equals(symbol, "irr")){
+                KeyboardRow row = new KeyboardRow();
+                row.add(symbol.toUpperCase());
+                keyboardRowList.add(row);
+            }
         }
 
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
