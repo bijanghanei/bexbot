@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Data
 @PropertySource("application.properties")
 public class BotConfig {
-    @Value("${bot.name}")
-    private String botName;
+    @Value("${bot.username}")
+    private String botUsername;
     @Value("${bot.token}")
     private String botToken;
 }
